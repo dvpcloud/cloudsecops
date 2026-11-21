@@ -1,19 +1,47 @@
-# Local credentials and environment
+# Credentials and local environment (never commit these)
 .kube/
 kubeconfig
-admin.conf
 *.kubeconfig
+admin.conf
+*-admin.conf
 .env
 .env.*
 !.env.example
+secrets/
+**/secret-values.yaml
+**/secret-data.yaml
+**/*secret*.local.yaml
+**/*secret*.local.yml
+
+# Private keys, certificates, and credential bundles
 *.pem
 *.key
 *.p12
 *.pfx
-secrets/
-**/secret-values.yaml
+*.jks
+*.keystore
+*.crt
+*.cer
+*.der
+id_rsa
+id_ed25519
+id_ecdsa
+known_hosts
+credentials
+credentials.json
+service-account*.json
+*-credentials.json
+*secret*.json
 
-# Terraform
+# Cloud provider credentials/config
+.aws/
+.azure/
+.gcloud/
+.config/gcloud/
+terraform.rc
+.terraformrc
+
+# Terraform: local providers, state, variables, and crash output
 .terraform/
 *.tfstate
 *.tfstate.*
@@ -24,6 +52,13 @@ override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
+
+# Kubernetes / Helm local rendered output or overrides
+helmfile*.yaml
+values.local.yaml
+values.local.yml
+rendered/
+manifests-rendered/
 
 # Local/editor/runtime
 .DS_Store
