@@ -1,0 +1,34 @@
+# Local credentials and environment
+.kube/
+kubeconfig
+admin.conf
+*.kubeconfig
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+**/secret-values.yaml
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Local/editor/runtime
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.bak
