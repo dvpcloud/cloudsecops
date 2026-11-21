@@ -26,6 +26,7 @@ This repository documents the lab as observed in the project conversation (Novem
 3. Follow [host workstation setup](docs/setup/workstation.md).
 4. Configure [kubeconfig access](docs/setup/kubeconfig.md).
 5. Use [the learning workflow](docs/workflow.md).
+6. Review [secrets and sensitive data policy](docs/security/secrets-handling.md).
 
 ## Repository principles
 
@@ -37,7 +38,7 @@ This repository documents the lab as observed in the project conversation (Novem
 
 ## Status
 
-Initial documentation scaffold. Host connectivity and kubeconfig authentication are **not yet verified** in this repository. Complete the setup steps from the host and record results in a sanitized form.
+Initial documentation scaffold. Host network connectivity to the Kubernetes API has been verified; kubeconfig authentication is **not yet verified**. Complete the setup steps from the host and record results in a sanitized form.
 
 ## License
 
