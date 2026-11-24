@@ -1,40 +1,34 @@
 # CloudSecOps Next Steps
 
-_Last updated: 2026-11-23 UTC._
+_Last updated: 2026-11-24 UTC._
 
-## Active exercise — Kubernetes RBAC Deep Dive Part 2
-Work in the existing lab and preserve cluster state. Do not use cluster-admin as the test identity.
+## Current checkpoint — Kubernetes RBAC Deep Dive Part 2
+Previously completed; do not repeat unless evidence changes:
+- Identity/context inspection.
+- Role and RoleBinding inspection for `developer-pod-reader` / `developer` and `lab-reader` / `lab-reader`.
+- Authorization matrix: 5/5 passed (developer Deployments read denied; lab-reader Deployments read allowed; lab-reader Deployment patch denied; Secrets read denied for both).
 
-1. **Reconcile identity and context**
-   - Inspect `kubectl config current-context` and `kubectl auth whoami` (where supported).
-   - Record the active user and groups without exposing kubeconfig contents.
-   - Confirm the target namespace is `devsecops-lab`.
+Current admin context is `kubernetes-admin@kubernetes` with wildcard permissions. Preserve it for administration only; do not use it as the restricted test identity.
 
-2. **Verify the intended ServiceAccount permissions**
-   - Use `kubectl auth can-i` with `--as=system:serviceaccount:devsecops-lab:developer` and the relevant namespace.
-   - Confirm allowed reads of Pods and Deployments.
-   - Confirm denied writes (for example create/delete Pods) and access to unrelated resources (for example Secrets).
-   - If impersonation is denied, do not grant it just to complete the test; use an authorized test identity or ask for the exact sanitized error.
+## Next learning sequence
+1. **ClusterRole vs. ClusterRoleBinding**
+   - ClusterRole can define cluster-wide permissions or reusable resource rules.
+   - RoleBinding can bind a Role or ClusterRole within one namespace; ClusterRoleBinding grants the referenced ClusterRole cluster-wide.
+   - Review scope and blast radius with examples before making changes.
 
-3. **Understand escalation controls**
-   - Study Kubernetes RBAC special verbs: `bind`, `escalate`, and `impersonate`.
-   - Inspect who can create/update Roles, ClusterRoles, RoleBindings and ClusterRoleBindings.
-   - Explain how Kubernetes prevents a principal from granting permissions it does not already hold, unless it has the relevant escalation/bind authority.
+2. **RBAC privilege-escalation safeguards**
+   - Learn and inspect special verbs: `bind`, `escalate`, and `impersonate`.
+   - Explain how Kubernetes prevents users from granting permissions they do not already possess, except where relevant special authority exists.
+   - Inspect who can create/update Roles, ClusterRoles, RoleBindings and ClusterRoleBindings. No broad grants or mutations for the exercise.
 
-4. **Check scope and bindings**
-   - Inspect the Role, RoleBinding, subjects and `roleRef`.
-   - Compare RoleBinding with ClusterRoleBinding.
-   - Test namespace isolation using a second namespace only if a safe test namespace is available.
+3. **Namespace boundary and token security**
+   - Namespace-boundary authorization test remains pending.
+   - Distinguish ServiceAccount API permissions from token mounting/authentication.
+   - Inspect ServiceAccount and Pod automount settings and projected token metadata without printing token contents.
 
-5. **ServiceAccount token security**
-   - Distinguish the ServiceAccount's API permissions from whether a Pod receives a token.
-   - Inspect `automountServiceAccountToken` at ServiceAccount and Pod level, projected token behaviour and token audience/expiry.
-   - Do not print or share token contents.
-
-6. **Record results**
-   - Capture sanitized allowed/denied checks.
-   - Update [LEARNING_PROGRESS.md](LEARNING_PROGRESS.md) only after tests pass.
-   - Add a focused exercise document under `security/rbac/` when the procedure is stable.
+4. **Record verified results**
+   - Update progress only after new tests pass.
+   - Add a focused exercise under `security/rbac/` when stable.
 
 ## After RBAC
 - Pod Security Standards and admission policy (Kyverno/OPA).
@@ -44,7 +38,7 @@ Work in the existing lab and preserve cluster state. Do not use cluster-admin as
 - Later roadmap stages: SPIFFE/SPIRE, Cilium/eBPF/Tetragon, SLSA, AI platform and agent/MCP security.
 
 ## Safety constraints
-- No destructive cluster resets or broad privilege grants.
+- Preserve the existing cluster; no destructive resets or broad privilege grants.
 - Never expose credentials, kubeconfig, tokens or live Secret values.
 - Inspect live state before applying manifests.
-- Every permission test must include expected allowed and denied cases.
+- Include expected allowed and denied cases in each new permission test.
