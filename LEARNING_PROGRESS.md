@@ -1,6 +1,6 @@
 # CloudSecOps Learning Progress
 
-_Last consolidated: 2026-11-23 UTC._
+_Last consolidated: 2026-11-24 UTC._
 
 ## Learning approach
 - Explain concepts and component relationships before advancing.
@@ -12,7 +12,7 @@ _Last consolidated: 2026-11-23 UTC._
 
 ## Roadmap status
 - **Month 1 — Reproducible Platform Foundations:** foundations covered; reproducible Git-managed platform deliverable remains in progress.
-- **Month 2 — Zero-Trust Cloud-Native & Runtime Security:** in progress; current focus Kubernetes RBAC.
+- **Month 2 — Zero-Trust Cloud-Native & Runtime Security:** in progress; Kubernetes RBAC deep dive.
 - **Months 3–6:** planned.
 
 ## Established learning
@@ -24,24 +24,22 @@ _Last consolidated: 2026-11-23 UTC._
 - RBAC Role/RoleBinding and namespace-scoped permissions.
 - ServiceAccount basics and token automount behaviour.
 
-## RBAC exercise evidence — 2026-11-23
-- Reviewed RoleBinding `developer-pod-reader-binding` in `devsecops-lab`.
-- Effective Role rules shown in the exercise: `get`, `list`, `watch` on `pods` and `deployments.apps`. This is read-only access to those resource types within the Role's namespace.
-- Inspected ServiceAccounts `developer` and `lab-reader`; displayed AUTOMOUNT as `<none>` (inherit/default, not proof of token issuance or token use).
-- User reported no Pods were running under those ServiceAccounts at the time.
-- User correctly identified that the Role permits reading/listing/watching Pods and Deployments, not arbitrary resources or write actions.
-- Verification of effective access as each ServiceAccount, namespace boundaries, token projection and escalation protections remains pending.
+## RBAC exercise evidence — 2026-11-23 to 2026-11-24
+- Inspected ServiceAccounts `developer` and `lab-reader`; AUTOMOUNT displayed `<none>` (inherit/default, not proof of token issuance or use).
+- Inspected Roles and RoleBindings in `devsecops-lab`. `developer-pod-reader` grants `get/list/watch` on Pods; `lab-reader` grants `get/list/watch` on Pods and Deployments. Each RoleBinding references its intended Role and ServiceAccount.
+- Earlier authorization test matrix passed **5/5**: developer cannot read Deployments; lab-reader can read Deployments; lab-reader cannot patch Deployments; neither identity can read Secrets.
+- Current context confirmed as `kubernetes-admin@kubernetes`, username `kubernetes-admin`, groups `kubeadm:cluster-admins` and `system:authenticated`; authorization output showed wildcard resource/verb permissions. Use only for administration, not as the restricted test identity.
+- Namespace boundary, actual token-based authentication/use, and special-verb/escalation analysis remain pending.
 
 ## Earlier security observations requiring revalidation
-- Earlier output identified the current caller as `kubernetes-admin` and showed broad cluster-admin-like authorization checks. Do not assume the same identity/context is active now.
 - Earlier Argo CD RBAC output contained broad wildcard permissions and a high-privilege application-controller binding. Reinspect current objects before drawing conclusions or changing them.
-- A prior SelfSubjectRules output appeared narrower than separate authorization checks. Reconcile identity, kubeconfig context, namespace and command scope before relying on either result.
+- Reconcile identity, kubeconfig context, namespace and command scope when authorization outputs differ.
 
 ## Evaluation record
-- **Criterion:** Interpret Role rules and the bound resource scope.
-- **Result:** Correctly identified read-only verbs on Pods and Deployments.
-- **Takeaway:** Role rules constrain both resource types and verbs; the RoleBinding determines which subject receives them and in which namespace.
-- **Next validation:** Test allowed and denied actions using the intended restricted identity, then verify cross-namespace denial.
+- **Criterion:** Interpret Role rules, RoleBinding subjects/roleRefs, and effective authorization.
+- **Result:** Role/RoleBinding inspection completed; prior 5/5 authorization checks passed.
+- **Takeaway:** Role rules define resource/verb permissions; RoleBinding attaches them to a subject in a namespace. A privileged admin context must not be confused with the restricted ServiceAccount.
+- **Next checkpoint:** ClusterRole vs. ClusterRoleBinding, then `bind`, `escalate`, and `impersonate` safeguards.
 
 ## Evidence discipline
 Record date, identity/context, namespace, command purpose, sanitized result and pass/fail. Never record bearer tokens, full kubeconfig, private keys, passwords or live Secret data.
